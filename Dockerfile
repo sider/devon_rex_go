@@ -1,4 +1,4 @@
-FROM quay.io/actcat/devon_rex_base:1.2.1
+FROM quay.io/actcat/devon_rex_base:1.3.1
 
 ENV GO_VERSION 1.8
 
@@ -12,5 +12,10 @@ RUN add-apt-repository ppa:masterminds/glide \
   && rm -rf /var/lib/apt/lists/*
 
 ENV GOROOT=/usr/local/go \
-    GOPATH=/root/go
+    GOPATH=$RUNNER_USER_HOME/go
 ENV PATH $PATH:$GOROOT/bin:$GOPATH/bin
+
+# Edit secure_path to include PATH required by Go
+USER root
+RUN sed -i -e '/secure_path/d' /etc/sudoers && \
+    echo "Defaults secure_path=\"$GEM_HOME/bin:/usr/local/bin:/usr/bin:/bin:$GOROOT/bin:$GOPATH/bin\"" >> /etc/sudoers
